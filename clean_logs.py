@@ -15,7 +15,7 @@ def celsius_converter(f_temp):
 def parse_and_clean(line):
     '''
     Parse and clean a single sensor data line.
-    
+
     Splits the string by the "|" delimiter and removes extra whitespace
     from each field. Returns None if the line contains missing or invalid
     data, or if the sensor status is not "ACTIVE".
@@ -23,9 +23,33 @@ def parse_and_clean(line):
     '''
     if isinstance(line, str):
         line = [i.strip() for i in line.split('|')]
-        if ('ERROR' in line or 'N/A' in line) or line[-1] != 'ACTIVE':
+        if len(line) != 5:
+            return None
+
+        if 'ERROR' in line or 'N/A' in line:
+            return None
+
+        if line[-1] != 'ACTIVE':
             return None
         return line
     else:
         return None
+
+
+if __name__ == '__main__':
+    with open('environmental_raw.txt', 'rt') as file:
+        with open ('environmental_cleaned.csv', 'wt') as output:
+            next(file)
+            output.write('Timestamp,StationID,Temp(C),Humidity(%),Sensor_Status\n')
+            corrupted_lines = 0
+            for line in file:
+                cleaned_line = parse_and_clean(line)
+                if cleaned_line is None:
+                    corrupted_lines += 1
+                else:
+                    cleaned_line[2] = str(celsius_converter(cleaned_line[2]))
+                    new_line = ','.join(cleaned_line)
+                    output.write(f'{new_line}\n')
+            print(f'Cleaned data saved. There were {corrupted_lines} corrupted logs in the file')
+
 
