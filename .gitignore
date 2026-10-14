@@ -1,0 +1,8 @@
+# Ignore input file
+environmental_raw.txt
+
+# Ignore output file
+environmental_cleaned.csv
+
+# Ignore python cache folders
+__pycache__/
